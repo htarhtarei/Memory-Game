@@ -3,10 +3,9 @@ interface Props {
     onCardClick: (value: number) => void;
     flippedCards: number[];
     isRefipping: boolean;
-    highlightedCardIndex: number | null;
 }
 
-const Card = ({ num, onCardClick, flippedCards, isRefipping, highlightedCardIndex }: Props) => {
+const Card = ({ num, onCardClick, flippedCards, isRefipping }: Props) => {
 
     const handleClick = () => {
         if (!isRefipping) {
@@ -15,7 +14,7 @@ const Card = ({ num, onCardClick, flippedCards, isRefipping, highlightedCardInde
     };
 
     const bgColorFun = () => {
-        if (isRefipping && highlightedCardIndex === num) {
+        if (isRefipping && !flippedCards.includes(num)) {
             return 'bg-white'; 
         }
 
@@ -29,10 +28,11 @@ const Card = ({ num, onCardClick, flippedCards, isRefipping, highlightedCardInde
     const bgColor = bgColorFun();
 
     return (
-        <li
-            className={`size-24 rounded-md shadow-sm duration-100 ${bgColor}`}
-            onClick={handleClick}
-        >
+        <li>
+            <button  
+                className={`size-24 rounded-md shadow-sm duration-100 ${bgColor}`} 
+                onClick={handleClick}
+            />
         </li>
     );
 };

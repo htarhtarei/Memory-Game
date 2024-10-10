@@ -8,22 +8,22 @@ function App() {
   const cardNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   const [flippedCardNumbers, setFlippedCardNumbers] = useState<number[]>([]);
   const [isRefipping, setIsRefipping] = useState(false);  
-  const [highlightedCardIndex, setHighlightedCardIndex] = useState<number | null>(null);
   const [isBreakTime, setIsBreakTime] = useState<boolean>(false);  
-  const reverseFlip = [...flippedCardNumbers].reverse();
 
   useEffect(() => {
     if (flippedCardNumbers.length === cardNumbers.length) {
+      toast.info("All cards are flipped!");
+
       setTimeout(() => {
-        toast.info("All cards are flipped!");
         setIsRefipping(true);
-        startColorChangeProcess();
+
+        startReflipProcess()
       }, 1000);
     }
   }, [flippedCardNumbers]);
 
   const handleCardClick = (num: number) => {
-    if (isRefipping || isBreakTime) return; 
+    if (isRefipping || isBreakTime) return; //if cards are reflipping , card are not able to click (card disable)
 
     if (!flippedCardNumbers.includes(num)) {
       setFlippedCardNumbers((prevNumbers) => [...prevNumbers, num]);
@@ -32,35 +32,28 @@ function App() {
     }
   };
 
-  const startColorChangeProcess = () => {
-    reverseFlip.forEach((num, index) => {
+  const startReflipProcess = () => {        
+    flippedCardNumbers.forEach((_, index) => {
       setTimeout(() => {
-        setHighlightedCardIndex(num);
-        startReflipProcess();
-      }, index * 1000);
-    });
-
-    setTimeout(() => {
-      setHighlightedCardIndex(null);
-    }, flippedCardNumbers.length * 1000);
-  };
-
-  const startReflipProcess = () => {
-    reverseFlip.forEach((num, index) => {
-      setTimeout(() => {
-        setFlippedCardNumbers((prevNumbers) => prevNumbers.filter((cardNum) => cardNum !== num));
-
-        if (index === reverseFlip.length - 1) {
+        setFlippedCardNumbers((prevNumbers) => {
+          const updatedNumbers = [...prevNumbers];
+          updatedNumbers.pop(); 
+          return updatedNumbers;
+        });
+        
+        if (index === flippedCardNumbers.length - 1) {
           setIsRefipping(false);
-          setIsBreakTime(true); 
+          setIsBreakTime(true)
+          
         }
       }, index * 1000);
     });
+   
   };
 
   const handleBreakTimerEnd = () => {
     setIsBreakTime(false); 
-  };
+  };  
 
   return (
     <div className="w-full flex justify-center my-4">
@@ -70,7 +63,7 @@ function App() {
         {isBreakTime ? (
           <BreakTimer onBreakEnd={handleBreakTimerEnd}/>
         ) : (
-          <ul className="mt-12 grid grid-cols-3 gap-y-2 cursor-pointer">
+          <ul className="mt-12 grid grid-cols-3 cursor-pointer">
             {cardNumbers.map((num) => (
               <Card
                 key={num}
@@ -78,7 +71,6 @@ function App() {
                 onCardClick={handleCardClick}
                 flippedCards={flippedCardNumbers}
                 isRefipping={isRefipping}
-                highlightedCardIndex={highlightedCardIndex}
               />
             ))}
           </ul>
